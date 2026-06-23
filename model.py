@@ -1,12 +1,20 @@
 from dataclasses import dataclass
 from random import randint
 
-# ==========================
-# ENTIDAD ASTEROIDE
-# ==========================
+
+# ==================================
+# ENTIDAD INMUTABLE ASTEROIDE
+# ==================================
 
 @dataclass(frozen=True)
 class Asteroid:
+    """
+    Representa un asteroide del simulador.
+
+    frozen=True evita modificar sus valores
+    después de ser creado.
+    """
+
     x: float
     y: float
     vx: float
