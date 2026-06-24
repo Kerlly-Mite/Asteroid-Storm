@@ -1,75 +1,50 @@
 import pygame
-import sys
-import random
 
-# --------------------
-# INICIALIZACIÓN
-# --------------------
-pygame.init()
+from model import create_initial_state
+from simulation import update_sequential, update_parallel
+from render import init_screen, draw
+from config import WIDTH, HEIGHT, DEFAULT_ASTEROIDS
 
-ANCHO = 800
-ALTO = 600
+def main():
 
-screen = pygame.display.set_mode((ANCHO, ALTO))
-pygame.display.set_caption("Asteroid Storm")
+    screen = init_screen(WIDTH, HEIGHT)
 
-clock = pygame.time.Clock()
-font = pygame.font.SysFont(None, 30)
+    state = create_initial_state(
+        DEFAULT_ASTEROIDS,
+        WIDTH,
+        HEIGHT
+    )
 
-# --------------------
-# OBJETO SIMPLE (ejemplo jugador)
-# --------------------
-player = pygame.Rect(400, 500, 50, 50)
-speed = 5
+    clock = pygame.time.Clock()
 
-# --------------------
-# LOOP PRINCIPAL
-# --------------------
-running = True
+    running = True
+    use_parallel = False
 
-while running:
+    while running:
 
-    # Control de FPS (60 FPS máximo)
-    dt = clock.tick(60)
-    fps = clock.get_fps()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
-    # --------------------
-    # EVENTOS
-    # --------------------
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    use_parallel = not use_parallel
 
-    # --------------------
-    # MOVIMIENTO
-    # --------------------
-    keys = pygame.key.get_pressed()
+        if use_parallel:
+            state = state.__class__(
+                update_parallel(state.asteroids, 4)
+            )
+        else:
+            state = state.__class__(
+                update_sequential(state.asteroids)
+            )
 
-    if keys[pygame.K_LEFT]:
-        player.x -= speed
-    if keys[pygame.K_RIGHT]:
-        player.x += speed
-    if keys[pygame.K_UP]:
-        player.y -= speed
-    if keys[pygame.K_DOWN]:
-        player.y += speed
+        draw(screen, state.asteroids)
 
-    # --------------------
-    # RENDER
-    # --------------------
-    screen.fill((0, 0, 0))
+        clock.tick(60)
 
-    # jugador
-    pygame.draw.rect(screen, (0, 255, 0), player)
+    pygame.quit()
 
-    # FPS en pantalla
-    fps_text = font.render(f"FPS: {int(fps)}", True, (255, 255, 255))
-    screen.blit(fps_text, (10, 10))
 
-    pygame.display.flip()
-
-# --------------------
-# SALIDA
-# --------------------
-pygame.quit()
-sys.exit()
+if __name__ == "__main__":
+    main()
