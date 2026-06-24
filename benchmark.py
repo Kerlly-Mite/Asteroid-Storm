@@ -1,43 +1,77 @@
-import pygame
-import time
-import sys
+from time import perf_counter
 
-def run_benchmark(duration=10):
-    pygame.init()
-    screen = pygame.display.set_mode((800, 600))
-    pygame.display.set_caption("Benchmark Asteroid Storm")
+from model import create_initial_state
 
-    clock = pygame.time.Clock()
-    frames = 0
-    start_time = time.time()
+from simulation import (
+    update_sequential,
+    update_parallel
+)
 
-    running = True
-    while running:
-        clock.tick(60)  # límite de FPS
-        frames += 1
+from config import WORKERS
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
 
-        screen.fill((0, 0, 0))
-        pygame.display.flip()
+def benchmark(amount):
 
-        if time.time() - start_time >= duration:
-            running = False
+    state = create_initial_state(
+        amount,
+        1200,
+        700
+    )
 
-    elapsed_time = time.time() - start_time
-    avg_fps = frames / elapsed_time
+    start = perf_counter()
 
-    pygame.quit()
+    for _ in range(100):
 
-    print("----- BENCHMARK RESULT -----")
-    print(f"Duración: {elapsed_time:.2f} segundos")
-    print(f"Frames renderizados: {frames}")
-    print(f"FPS promedio: {avg_fps:.2f}")
+        update_sequential(
+            state.asteroids
+        )
 
-    return avg_fps
+    sequential_time = (
+        perf_counter() - start
+    )
+
+    start = perf_counter()
+
+    for _ in range(100):
+
+        update_parallel(
+            state.asteroids,
+            WORKERS
+        )
+
+    parallel_time = (
+        perf_counter() - start
+    )
+
+    print()
+    print(
+        "Asteroides:",
+        amount
+    )
+
+    print(
+        "Secuencial:",
+        round(
+            sequential_time,
+            3
+        ),
+        "segundos"
+    )
+
+    print(
+        "Paralelo:",
+        round(
+            parallel_time,
+            3
+        ),
+        "segundos"
+    )
 
 
 if __name__ == "__main__":
-    run_benchmark()
+
+    benchmark(1000)
+
+    benchmark(3000)
+
+    benchmark(5000)

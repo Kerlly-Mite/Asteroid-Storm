@@ -1,10 +1,6 @@
-from model import Asteroid
 from multiprocessing import Pool
+from model import Asteroid
 
-
-# ==================================
-# ACTUALIZAR UN ASTEROIDE
-# ==================================
 
 def update_asteroid(asteroid):
 
@@ -17,20 +13,16 @@ def update_asteroid(asteroid):
     )
 
 
-# ==================================
-# ACTUALIZACION SECUENCIAL
-# ==================================
-
 def update_sequential(asteroids):
 
     return tuple(
+
         update_asteroid(asteroid)
+
         for asteroid in asteroids
+
     )
 
-# ==================================
-# ACTUALIZACION PARALELA
-# ==================================
 
 def update_parallel(
         asteroids,

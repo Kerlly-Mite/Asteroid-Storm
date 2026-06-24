@@ -1,5 +1,8 @@
 from model import create_initial_state
-from simulation import update_sequential
+
+from simulation import (
+    update_sequential
+)
 
 
 state = create_initial_state(
@@ -15,5 +18,7 @@ new_asteroids = update_sequential(
 print("Antes:")
 print(state.asteroids[0])
 
-print("\nDespues:")
+print()
+
+print("Despues:")
 print(new_asteroids[0])
