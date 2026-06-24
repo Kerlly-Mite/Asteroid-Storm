@@ -7,10 +7,10 @@ state = create_initial_state(
     600
 )
 
-
 print("Cantidad de asteroides:")
 print(len(state.asteroids))
 
+print()
 
-print("\nPrimer asteroide:")
+print("Primer asteroide:")
 print(state.asteroids[0])
